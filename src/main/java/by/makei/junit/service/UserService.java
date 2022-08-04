@@ -2,9 +2,9 @@ package by.makei.junit.service;
 
 import by.makei.junit.dto.User;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 public class UserService {
 
@@ -14,8 +14,8 @@ public class UserService {
         return users;
     }
 
-    public boolean add(User user) {
-        return users.add(user);
+    public boolean add(User...users) {
+        return this.users.addAll(Arrays.asList(users));
     }
 
     public Optional<User> login(String name, String password) {
@@ -23,5 +23,9 @@ public class UserService {
                 .filter(user -> user.getName().equals(name))
                 .filter(user -> user.getPassword().equals(password))
                 .findFirst();
+    }
+
+    public Map<Long, User> getAllConvertedById() {
+        return users.stream().collect(Collectors.toMap(User::getId, Function.identity())); //Function.identity() - return t -> t;
     }
 }

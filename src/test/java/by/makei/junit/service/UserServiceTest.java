@@ -1,11 +1,15 @@
 package by.makei.junit.service;
 
 import by.makei.junit.dto.User;
+import org.hamcrest.MatcherAssert;
+import org.hamcrest.collection.IsMapContaining;
 import org.junit.jupiter.api.*;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
 
 @TestInstance(TestInstance.Lifecycle.PER_METHOD)
@@ -43,26 +47,48 @@ public class UserServiceTest {
         userService.add(IVAN);
         userService.add(SASHA);
         List<User> users = userService.getAll();
-        assertEquals(2, users.size());
+//        assertEquals(2, users.size());
+        assertThat(users).hasSize(2);// AssertJ variant
     }
 
     @Test
     void isLogin() {
         userService.add(IVAN);
         Optional<User> maybeUser = userService.login(IVAN.getName(), IVAN.getPassword());
-        assertTrue(maybeUser.isPresent());
-        maybeUser.ifPresent(user -> assertEquals(IVAN, user));
+//        assertTrue(maybeUser.isPresent());
+        assertThat(maybeUser).isPresent();
+//        maybeUser.ifPresent(user -> assertEquals(IVAN, user));
+        maybeUser.ifPresent(user -> assertThat(user).isEqualTo(IVAN));
     }
 
     @Test
-    void loginFailIfPasswordIsIncorrect(){
+    void usersConvertedById() {
+        userService.add(IVAN, SASHA);
+        Map<Long, User> userMap = userService.getAllConvertedById();
+
+        MatcherAssert.assertThat(userMap, IsMapContaining.hasKey(IVAN.getId())); //hamcrest variant
+        assertAll(
+                () -> assertThat(userMap).containsKeys(IVAN.getId(), SASHA.getId()),
+                () -> assertThat(userMap).containsValues(SASHA, IVAN)
+        );
+    }
+
+    @Test
+    void usersConvertToMapById() {
+        userService.add(IVAN);
+        userService.add(SASHA);
+
+    }
+
+    @Test
+    void loginFailIfPasswordIsIncorrect() {
         userService.add(IVAN);
         Optional<User> maybeUser = userService.login(IVAN.getName(), "dummy");
         assertFalse(maybeUser.isPresent());
     }
 
     @Test
-    void loginFailIfUserNotExists(){
+    void loginFailIfUserNotExists() {
         userService.add(IVAN);
         Optional<User> maybeUser = userService.login("dummy", IVAN.getPassword());
         assertFalse(maybeUser.isPresent());
