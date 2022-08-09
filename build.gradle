@@ -18,6 +18,9 @@ dependencies {
     testImplementation 'org.junit.jupiter:junit-jupiter-api:5.8.1'
     testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.8.1'
 
+    // https://mvnrepository.com/artifact/org.junit.jupiter/junit-jupiter-params параметризованные тесты
+    testImplementation group: 'org.junit.jupiter', name: 'junit-jupiter-params', version: '5.8.1'
+
     testImplementation 'org.assertj:assertj-core:3.21.0'
     testImplementation 'org.hamcrest:hamcrest:2.2'
 

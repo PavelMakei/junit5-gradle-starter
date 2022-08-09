@@ -6,14 +6,19 @@ import org.hamcrest.MatcherAssert;
 import org.hamcrest.collection.IsMapContaining;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.CsvFileSource;
+import org.junit.jupiter.params.provider.CsvSource;
+import org.junit.jupiter.params.provider.MethodSource;
 
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Stream;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @TestInstance(TestInstance.Lifecycle.PER_METHOD)
 // by default
@@ -28,7 +33,7 @@ public class UserServiceTest {
     private static final User SASHA = User.of(2, "Sasha", "321");
     private UserService userService;
 
-    UserServiceTest(TestInfo testInfo){
+    UserServiceTest(TestInfo testInfo) {
         System.out.println();
     }
 
@@ -69,7 +74,6 @@ public class UserServiceTest {
     @Test
     @Tag("login")
     @Order(3)
-
     void isLogin() {
         System.out.println("Test 3 " + this);
         userService.add(IVAN);
@@ -127,6 +131,51 @@ public class UserServiceTest {
 
     }
 
+    @ParameterizedTest(name = "{arguments} test")
+//    @ArgumentsSource()
+//    @NullSource
+//    @EmptySource
+//    @ValueSource(strings ={"Ivan", "Sasha"} )
+//            @EnumSource
+//    @NullAndEmptySource
+    @CsvFileSource(resources = "/login-test-data.csv", delimiter = ',', numLinesToSkip = 0)
+//            @CsvSource({
+//                    "Ivan",
+//                    "Petr"
+//            })
+//    @MethodSource("getArgumentSource")
+    @DisplayName("This is loginParametrizedTest")
+    void loginParametrizedTest(String username) {
+        userService.add(IVAN, SASHA);
+        var maybeUser = userService.login(username, "123");
+
+    }
+
+    static Stream<Arguments> getArgumentSource() {
+        return Stream.of(
+                Arguments.of("Sasha"),
+                Arguments.of("Petr"),
+                Arguments.of("Dima")
+        );
+    }
+
+    @ParameterizedTest
+    @MethodSource("getArgumentSource2")
+    void loginParametrizedTest2(String username, String password, Optional<User> user) {
+        userService.add(IVAN, SASHA);
+        var maybeUser = userService.login(username, password);
+        assertThat(maybeUser).isEqualTo(user);
+
+    }
+
+    static Stream<Arguments> getArgumentSource2() {
+        return Stream.of(
+                Arguments.of("Sasha", "321", Optional.of(SASHA)),
+                Arguments.of("Petr", "111", Optional.empty()),
+                Arguments.of("Ivan", "123", Optional.of(IVAN))
+        );
+    }
+
 
     @AfterEach
     void deleteDataFromDb() {
@@ -141,7 +190,7 @@ public class UserServiceTest {
     @Nested
     @DisplayName("nested class test")
     @Tag("login")
-    class LoginTest{
+    class LoginTest {
         //сюда можно перенести все методы с аннотацией тег логин
 
         @Test
@@ -149,10 +198,12 @@ public class UserServiceTest {
             System.out.println("This is nested class method 1");
             assertTrue(true);
         }
+
         @Test
-        void testNestedClass2(){
+        void testNestedClass2() {
             System.out.println("This is nested class method 2");
             assertTrue(true);
+
         }
 
     }
