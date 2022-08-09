@@ -9,12 +9,14 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.CsvFileSource;
-import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.MethodSource;
 
+import java.lang.annotation.Repeatable;
+import java.time.Duration;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Stream;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -103,18 +105,30 @@ public class UserServiceTest {
 
     }
 
-    @Test
+//    @Test
     @Tag("login")
-    void loginFailIfPasswordIsIncorrect() {
+//    @Disabled("this is just comment")
+    @RepeatedTest(value = 5, name = RepeatedTest.LONG_DISPLAY_NAME)
+    void loginFailIfPasswordIsIncorrect(RepetitionInfo repetitionInfo) { //Repetition info is not necessary it just let get number of repetition for log for example
         userService.add(IVAN);
         Optional<User> maybeUser = userService.login(IVAN.getName(), "dummy");
         assertFalse(maybeUser.isPresent());
     }
 
     @Test
+    void checkLoginFunctionalityPerformance(){
+        var result = assertTimeout(Duration.ofMillis(200L), ()->{
+            Thread.sleep(100L);
+            return userService.login(IVAN.getName(), IVAN.getPassword());
+        });
+    }
+
+    @Test
     @Tag("login")
-    void loginFailIfUserNotExists() {
+    @Timeout(value = 100, unit = TimeUnit.MILLISECONDS)
+    void loginFailIfUserNotExists() throws InterruptedException {
         userService.add(IVAN);
+        Thread.sleep(10);
         Optional<User> maybeUser = userService.login("dummy", IVAN.getPassword());
         assertFalse(maybeUser.isPresent());
     }
