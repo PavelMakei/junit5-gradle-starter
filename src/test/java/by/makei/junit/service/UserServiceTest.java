@@ -1,9 +1,10 @@
 package by.makei.junit.service;
 
+import by.makei.junit.dao.UserDao;
 import by.makei.junit.dto.User;
-import by.makei.junit.extention.*;
-import lombok.Getter;
-import lombok.Value;
+import by.makei.junit.extention.ConditionalExtension;
+import by.makei.junit.extention.PostProcessingExtension;
+import by.makei.junit.extention.UserServiceParamResolver;
 import org.hamcrest.MatcherAssert;
 import org.hamcrest.collection.IsMapContaining;
 import org.junit.jupiter.api.*;
@@ -12,10 +13,9 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.CsvFileSource;
 import org.junit.jupiter.params.provider.MethodSource;
+import org.mockito.Mockito;
 
-import java.beans.Transient;
 import java.io.IOException;
-import java.lang.annotation.Target;
 import java.time.Duration;
 import java.util.List;
 import java.util.Map;
@@ -31,13 +31,14 @@ import static org.junit.jupiter.api.Assertions.*;
 //In the Junit 5 classes and methods should be package private (friendly)
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 @ExtendWith({//указать все экстеншены, чтобы резолвер смог их опознать
-        UserServiceParamResolver.class
-        ,PostProcessingExtension.class
+        UserServiceParamResolver.class //sets userService
+        , PostProcessingExtension.class
         , ConditionalExtension.class
-        , ThrowableExtension.class
+//        , ThrowableExtension.class //кэтчит все экстеншены
 //        , GlobalExtension.class
 })
-public class UserServiceTest extends AbstractTestBase{
+public class UserServiceTest extends AbstractTestBase {
+    private UserDao userDao;
 
     private static final User IVAN = User.of(1, "Ivan", "123");
     private static final User SASHA = User.of(2, "Sasha", "321");
@@ -55,12 +56,26 @@ public class UserServiceTest extends AbstractTestBase{
     }
 
     @BeforeEach
-    void prepare(UserService userService) {
+//    void prepare(UserService userService) {
+    void prepare() {
         System.out.println("Before each " + this);
-//        userService = new UserService();
-        this.userService = userService;
-
+        this.userDao = Mockito.mock(UserDao.class);
+        this.userService = new UserService(userDao);
     }
+
+    @Test
+    void shouldDeleteExistedUser() {
+        userService.add(IVAN);
+//        Mockito.doReturn(true).when(userDao).delete(IVAN.getId());//stub
+//        Mockito.doReturn(true).when(userDao).delete(Mockito.any());//stub dummy
+        Mockito.when(userDao.delete(IVAN.getId())).thenReturn(true)
+                .thenReturn(false);//second variant of stub
+        var result = userService.delete(IVAN.getId());
+        System.out.println(userService.delete(IVAN.getId()));
+        System.out.println(userService.delete(IVAN.getId()));
+        assertThat(result).isTrue();
+    }
+
 
     @Test
     @Order(2)
@@ -93,7 +108,7 @@ public class UserServiceTest extends AbstractTestBase{
         assertThat(maybeUser).isPresent();
 //        maybeUser.ifPresent(user -> assertEquals(IVAN, user));
         maybeUser.ifPresent(user -> assertThat(user).isEqualTo(IVAN));
-        if(true){
+        if (true) {
 //            throw new IOException("test reason");
             throw new RuntimeException("test reason");
         }
@@ -118,7 +133,7 @@ public class UserServiceTest extends AbstractTestBase{
 
     }
 
-//    @Test
+    //    @Test
     @Tag("login")
 //    @Disabled("this is just comment")
     @RepeatedTest(value = 5, name = RepeatedTest.LONG_DISPLAY_NAME)
@@ -129,8 +144,8 @@ public class UserServiceTest extends AbstractTestBase{
     }
 
     @Test
-    void checkLoginFunctionalityPerformance(){
-        var result = assertTimeout(Duration.ofMillis(200L), ()->{
+    void checkLoginFunctionalityPerformance() {
+        var result = assertTimeout(Duration.ofMillis(200L), () -> {
             Thread.sleep(100L);
             return userService.login(IVAN.getName(), IVAN.getPassword());
         });

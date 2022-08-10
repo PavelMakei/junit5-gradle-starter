@@ -1,7 +1,6 @@
 package by.makei.junit.extention;
 
 import by.makei.junit.service.UserService;
-import lombok.Getter;
 import org.junit.jupiter.api.extension.ExtensionContext;
 import org.junit.jupiter.api.extension.TestInstancePostProcessor;
 
@@ -19,7 +18,7 @@ public class PostProcessingExtension implements TestInstancePostProcessor {
         for (Field field: fields){
             if(field.getName().equals("userService")){
                 field.setAccessible(true);
-                field.set(testInstance, new UserService());
+                field.set(testInstance, new UserService(null));
             }
         }
 

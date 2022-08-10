@@ -1,5 +1,6 @@
 package by.makei.junit.service;
 
+import by.makei.junit.dao.UserDao;
 import by.makei.junit.dto.User;
 
 import java.util.*;
@@ -7,8 +8,14 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 public class UserService {
+    private final UserDao userDao;
+
 
     private final List<User> users = new ArrayList<>();
+
+    public UserService(UserDao userDao) {
+        this.userDao = userDao;
+    }
 
     public List<User> getAll() {
         return users;
@@ -16,6 +23,10 @@ public class UserService {
 
     public boolean add(User...users) {
         return this.users.addAll(Arrays.asList(users));
+    }
+
+    public boolean delete(Long userId){
+        return userDao.delete(userId);
     }
 
     public Optional<User> login(String name, String password) {
