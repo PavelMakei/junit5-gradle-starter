@@ -1,4 +1,4 @@
-package by.makei.junit.paramresolver;
+package by.makei.junit.extention;
 
 import by.makei.junit.service.UserService;
 import org.junit.jupiter.api.extension.ExtensionContext;
@@ -18,7 +18,7 @@ public class UserServiceParamResolver implements ParameterResolver {
 
     @Override
     public Object resolveParameter(ParameterContext parameterContext, ExtensionContext extensionContext) throws ParameterResolutionException {
-        var store = extensionContext.getStore(ExtensionContext.Namespace.create(UserService.class));//nameSpace ключ для store
+        var store = extensionContext.getStore(ExtensionContext.Namespace.create(extensionContext.getTestMethod()));//nameSpace ключ для store
          return store.getOrComputeIfAbsent(UserService.class, it -> new UserService());
     }
 }

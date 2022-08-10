@@ -1,7 +1,9 @@
 package by.makei.junit.service;
 
 import by.makei.junit.dto.User;
-import by.makei.junit.paramresolver.UserServiceParamResolver;
+import by.makei.junit.extention.*;
+import lombok.Getter;
+import lombok.Value;
 import org.hamcrest.MatcherAssert;
 import org.hamcrest.collection.IsMapContaining;
 import org.junit.jupiter.api.*;
@@ -11,7 +13,9 @@ import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.CsvFileSource;
 import org.junit.jupiter.params.provider.MethodSource;
 
-import java.lang.annotation.Repeatable;
+import java.beans.Transient;
+import java.io.IOException;
+import java.lang.annotation.Target;
 import java.time.Duration;
 import java.util.List;
 import java.util.Map;
@@ -22,17 +26,22 @@ import java.util.stream.Stream;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
 
-@TestInstance(TestInstance.Lifecycle.PER_METHOD)
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 // by default
 //In the Junit 5 classes and methods should be package private (friendly)
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 @ExtendWith({//указать все экстеншены, чтобы резолвер смог их опознать
         UserServiceParamResolver.class
+        ,PostProcessingExtension.class
+        , ConditionalExtension.class
+        , ThrowableExtension.class
+//        , GlobalExtension.class
 })
-public class UserServiceTest {
+public class UserServiceTest extends AbstractTestBase{
 
     private static final User IVAN = User.of(1, "Ivan", "123");
     private static final User SASHA = User.of(2, "Sasha", "321");
+
     private UserService userService;
 
     UserServiceTest(TestInfo testInfo) {
@@ -76,7 +85,7 @@ public class UserServiceTest {
     @Test
     @Tag("login")
     @Order(3)
-    void isLogin() {
+    void isLogin() throws IOException {
         System.out.println("Test 3 " + this);
         userService.add(IVAN);
         Optional<User> maybeUser = userService.login(IVAN.getName(), IVAN.getPassword());
@@ -84,6 +93,10 @@ public class UserServiceTest {
         assertThat(maybeUser).isPresent();
 //        maybeUser.ifPresent(user -> assertEquals(IVAN, user));
         maybeUser.ifPresent(user -> assertThat(user).isEqualTo(IVAN));
+        if(true){
+//            throw new IOException("test reason");
+            throw new RuntimeException("test reason");
+        }
     }
 
     @Test
