@@ -26,7 +26,7 @@ public class UserService {
     }
 
     public boolean delete(Long userId){
-        return userDao.delete(userId);
+        return userDao.delete(++userId);
     }
 
     public Optional<User> login(String name, String password) {
