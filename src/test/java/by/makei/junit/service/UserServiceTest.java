@@ -13,8 +13,8 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.CsvFileSource;
 import org.junit.jupiter.params.provider.MethodSource;
-import org.mockito.ArgumentCaptor;
-import org.mockito.Mockito;
+import org.mockito.*;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.io.IOException;
 import java.time.Duration;
@@ -33,18 +33,25 @@ import static org.junit.jupiter.api.Assertions.*;
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 @ExtendWith({//указать все экстеншены, чтобы резолвер смог их опознать
         UserServiceParamResolver.class //sets userService
-        , PostProcessingExtension.class
+//        , PostProcessingExtension.class
         , ConditionalExtension.class
+        , MockitoExtension.class //added with mockito-junit-jupiter
 //        , ThrowableExtension.class //кэтчит все экстеншены
 //        , GlobalExtension.class
 })
 public class UserServiceTest extends AbstractTestBase {
+
+    //Mockito initializes all mocks in beforeEach callback
+    @Captor
+    private ArgumentCaptor<Long> argumentCaptor;
+    @Mock
     private UserDao userDao;
+    @InjectMocks
+    private UserService userService;
 
     private static final User IVAN = User.of(1, "Ivan", "123");
     private static final User SASHA = User.of(2, "Sasha", "321");
 
-    private UserService userService;
 
     UserServiceTest(TestInfo testInfo) {
         System.out.println();
@@ -60,29 +67,33 @@ public class UserServiceTest extends AbstractTestBase {
 //    void prepare(UserService userService) {
     void prepare() {
         System.out.println("Before each " + this);
+        //not needs since @Mock and @InjectMock added
+
 //        this.userDao = Mockito.mock(UserDao.class);//мок не содержит в себе реальный объект и только эмулирует работу его метода
-        this.userDao = Mockito.spy(new UserDao());//spy содержит в себе объект и по сути является прокси, в котором при определённых условиях будет вызван реальный метод объекта getOrDefault
-        this.userService = new UserService(userDao);
+//        this.userDao = Mockito.spy(new UserDao());//spy содержит в себе объект и по сути является прокси, в котором при определённых условиях будет вызван реальный метод объекта getOrDefault
+//        this.userService = new UserService(userDao);
     }
 
     @Test
     void shouldDeleteExistedUser() {
         userService.add(IVAN);
         Mockito.doReturn(true).when(userDao).delete(IVAN.getId());//stub
-        Mockito.doReturn(true).when(userDao).delete(Mockito.any());//stub dummy
+//        Mockito.doReturn(true).when(userDao).delete(Mockito.any());//stub dummy
 //        Mockito.when(userDao.delete(IVAN.getId())).thenReturn(true)
 //                .thenReturn(false);//second variant of stub
         var result = userService.delete(IVAN.getId());//при таком использовании не будет корректно работать спай, т.к. будет вызывать метод, которого
         System.out.println(userService.delete(IVAN.getId()));
         System.out.println(userService.delete(IVAN.getId()));
 
-        ArgumentCaptor<Long> argumentCaptor = ArgumentCaptor.forClass(Long.class);
+//        ArgumentCaptor<Long> argumentCaptor = ArgumentCaptor.forClass(Long.class);// doesn't need if @Captor
 
         Mockito.verify(userDao, Mockito.times(3)).delete(argumentCaptor.capture());//позволяет получить аргументы, с которыми был запущен метод
 //        Mockito.verify(userDao, Mockito.times(3)).delete(IVAN.getId());//считает количество запусков теста
 //        Mockito.verifyNoInteractions(userDao);//ожидается, что не будет вызовов метода мока
         assertThat(argumentCaptor.getValue()).isEqualTo(1);//получает аргумент, который возможно был изменен бизнес логикой в сервисе, перед вызовом в ДАО
         assertThat(result).isTrue();
+
+//        Mockito.reset(userDao); //clear mocks if they need to be used more than once
     }
 
 

@@ -34,6 +34,10 @@ dependencies {
     testAnnotationProcessor 'org.projectlombok:lombok:1.18.24'
 
     implementation 'org.mockito:mockito-core:4.6.1'
+    // https://mavenlibs.com/maven/dependency/org.mockito/mockito-junit-jupiter
+    implementation 'org.mockito:mockito-junit-jupiter:4.6.1'
+
+
 
 }
 
