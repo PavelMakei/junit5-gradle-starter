@@ -15,15 +15,15 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class CompanyService {
 
-    private final CrudRepository<Integer, Company> companyRepository;
+    private final CrudRepository<Long, Company> companyRepository;
     private final UserService userService;
     private final ApplicationEventPublisher eventPublisher;
 
-    public Optional<CompanyReadDto> findById(Integer id) {
+    public Optional<CompanyReadDto> findById(Long id) {
         return companyRepository.findById(id)
             .map(entity -> {
                 eventPublisher.publishEvent(new EntityEvent(entity, AccessType.READ));
-                return new CompanyReadDto(entity.id());
+                return new CompanyReadDto(entity.getId());
             });
     }
 }

@@ -12,6 +12,7 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Repository;
 
 import javax.annotation.PostConstruct;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -21,7 +22,7 @@ import java.util.Optional;
 @Transaction
 @Auditing
 @RequiredArgsConstructor
-public class CompanyRepository implements CrudRepository<Integer, Company> {
+public class CompanyRepository implements CrudRepository<Long, Company> {
 
     private final ConnectionPool pool1;
     private final List<ConnectionPool> pools;
@@ -34,9 +35,9 @@ public class CompanyRepository implements CrudRepository<Integer, Company> {
     }
 
     @Override
-    public Optional<Company> findById(Integer id) {
+    public Optional<Company> findById(Long id) {
         System.out.println("findById method...");
-        return Optional.of(new Company(id));
+        return Optional.of(new Company(id,null, Collections.emptyMap()));
     }
 
     @Override

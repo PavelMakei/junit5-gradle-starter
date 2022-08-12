@@ -7,7 +7,9 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 
@@ -16,8 +18,9 @@ import java.util.Map;
 @AllArgsConstructor
 @Builder
 @Entity //сущность хайбернейта
-@Table (name = "company")//с маленькой
-public class Company implements BaseEntity<Long>{
+@Table (name = "chat")//с маленькой
+public class Chat implements BaseEntity<Long>{
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -26,12 +29,9 @@ public class Company implements BaseEntity<Long>{
     @Column(name = "name", unique = true, nullable = false)//можно и не писать, но правила хорошего тона
     private String name;
 
-
+    @OneToMany(mappedBy = "chat")
     @Builder.Default
-    @ElementCollection
-    @CollectionTable(name = "company_locales", joinColumns = @JoinColumn(name = "company_id"))
-    @MapKeyColumn(name = "lang")
-    @Column(name = "description")
-    private Map<String,String> locales = new HashMap<>();
+    private List<UserChat> userChats = new ArrayList<>();
+
 
 }

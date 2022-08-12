@@ -23,8 +23,31 @@ spring.profiles.active: qa
 
 logging:
   level:
-    root: WARN
+    root: INFO
     by.makei.spring.database.pool: INFO
   file:
     name: log.log
     path: /
+
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5433/postgres
+    username: postgres
+    password: pass
+    driver-class-name: org.postgresql.Driver
+  jpa:
+    properties:
+      hibernate:
+        show_sql: true
+        format_sql: true
+        hbm2ddl:
+          auto: validate
+#          validate: проверить схему, не вносить изменения в базу данных.
+#          update: обновить схему.
+#          create: создает схему, уничтожая предыдущие данные.
+#          create-drop: отказаться от схемы, когда SessionFactory закрывается явно, как правило, когда приложение остановлено.
+
+
+
+
+

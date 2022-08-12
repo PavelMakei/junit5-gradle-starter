@@ -10,6 +10,7 @@ import org.mockito.*;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.context.ApplicationEventPublisher;
 
+import java.util.Collections;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -21,10 +22,10 @@ import static org.mockito.Mockito.verifyNoMoreInteractions;
 
 @ExtendWith(MockitoExtension.class)//needs to work with annotations
 class CompanyServiceTest2 {
-    private static final Integer COMPANY_ID = 1;
+    private static final Long COMPANY_ID = 1l;
 
     @Mock
-    private CrudRepository<Integer, Company> companyRepository;
+    private CrudRepository<Long, Company> companyRepository;
     @Mock
     private UserService userService;
     @Mock
@@ -35,7 +36,7 @@ class CompanyServiceTest2 {
     @Test
     void findById() {
 
-        Mockito.doReturn(Optional.of(new Company(COMPANY_ID)))
+        Mockito.doReturn(Optional.of(new Company(COMPANY_ID, null, Collections.emptyMap())))
                 .when(companyRepository).findById(COMPANY_ID);//здесь мокается функционал заглушки
 
         Optional<CompanyReadDto> actualResult = companyService.findById(COMPANY_ID);

@@ -25,7 +25,7 @@ import static org.mockito.ArgumentMatchers.any;
 @TestConstructor(autowireMode = TestConstructor.AutowireMode.ALL)//можно вынести в spring.properties для тестов, т.е. установить по умолчанию
 @It
 public class CompanyServiceTestIt {
-    private static final Integer COMPANY_ID = 1;
+    private static final Long COMPANY_ID = 1l;
 
     private final DatabaseProperties databaseProperties;
     private final CompanyService companyService;
