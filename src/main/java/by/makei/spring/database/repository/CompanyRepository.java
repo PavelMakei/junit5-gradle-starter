@@ -22,7 +22,7 @@ import java.util.Optional;
 @Transaction
 @Auditing
 @RequiredArgsConstructor
-public class CompanyRepository implements CrudRepository<Long, Company> {
+public class CompanyRepository implements CrudRepository<Integer, Company> {
 
     private final ConnectionPool pool1;
     private final List<ConnectionPool> pools;
@@ -35,9 +35,9 @@ public class CompanyRepository implements CrudRepository<Long, Company> {
     }
 
     @Override
-    public Optional<Company> findById(Long id) {
+    public Optional<Company> findById(Integer id) {
         System.out.println("findById method...");
-        return Optional.of(new Company(id,null, Collections.emptyMap()));
+        return Optional.of(new Company(id, null, Collections.emptyMap()));
     }
 
     @Override

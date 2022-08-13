@@ -1,6 +1,6 @@
 package by.makei.spring.integration.annotation;
 
-
+import by.makei.spring.integration.TestApplicationRunner;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 
@@ -9,9 +9,9 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
-@Target(value = ElementType.TYPE)
+@Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)
 @ActiveProfiles("test")
-@SpringBootTest
-public @interface It {
+@SpringBootTest(classes = TestApplicationRunner.class)
+public @interface IT {
 }

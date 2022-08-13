@@ -28,7 +28,6 @@ logging:
   file:
     name: log.log
     path: /
-
 spring:
   datasource:
     url: jdbc:postgresql://localhost:5433/postgres
@@ -36,18 +35,7 @@ spring:
     password: pass
     driver-class-name: org.postgresql.Driver
   jpa:
-    properties:
-      hibernate:
-        show_sql: true
-        format_sql: true
-        hbm2ddl:
-          auto: validate
-#          validate: проверить схему, не вносить изменения в базу данных.
-#          update: обновить схему.
-#          create: создает схему, уничтожая предыдущие данные.
-#          create-drop: отказаться от схемы, когда SessionFactory закрывается явно, как правило, когда приложение остановлено.
-
-
-
-
-
+    properties.hibernate:
+      show_sql: true
+      format_sql: true
+      hbm2ddl.auto: validate

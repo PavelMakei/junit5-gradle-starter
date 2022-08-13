@@ -4,20 +4,30 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.hibernate.annotations.GenericGenerator;
 
-import javax.persistence.*;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
+import javax.persistence.FetchType;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
+import javax.persistence.Table;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
-@Entity
-@Table(name = "users")
-@NoArgsConstructor
 @Data
+@NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class User implements BaseEntity<Long>{
+@Entity
+@Table(name = "users")
+public class User implements BaseEntity<Long> {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -26,24 +36,32 @@ public class User implements BaseEntity<Long>{
     @Column(unique = true, nullable = false)
     private String username;
 
-    @Column(name = "birth_date")//можно и не указывать, т.к. по умолчанию используется стратегия преобразования CamelCase в Sql, можно переопределить через properties spring.jpa.hibernate.naming.implicit-strategy , spring.jpa.hibernate.naming.physical-strategy
     private LocalDate birthDate;
 
     private String firstname;
+
     private String lastname;
 
-    @Enumerated(value = EnumType.STRING)//т.к. по умолчанию это Ordinal
+    @Enumerated(EnumType.STRING)
     private Role role;
 
-    @ManyToOne(fetch = FetchType.LAZY)//решение проблемы N+1
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "company_id")
     private Company company;
 
-
-    @OneToMany(mappedBy = "user")
     @Builder.Default
+    @OneToMany(mappedBy = "user")
     private List<UserChat> userChats = new ArrayList<>();
-
-
-
 }
+
+
+
+
+
+
+
+
+
+
+
+
